@@ -6,7 +6,9 @@ Tareas Bases Datos
 select * from suppliers s;
 
 select s.contact_name
+
 from suppliers s 
+
 where contact_title ='Sales Representative';
 
 -----Qué contactos de proveedores no son marketing managers?
