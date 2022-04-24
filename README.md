@@ -1,6 +1,8 @@
 # Tareas-SOM
 Tareas Bases Datos
+
 ----Qué contactos de proveedores tienen la posición de sales representative?
+
 select * from suppliers s;
 
 select s.contact_name
