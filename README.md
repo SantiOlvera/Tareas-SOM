@@ -13,3 +13,4 @@ where contact_title ='Sales Representative';
 select s.contact_name 
 from suppliers s 
 where contact_title !='Marketing Manager';
+
