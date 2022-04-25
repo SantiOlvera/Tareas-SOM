@@ -60,3 +60,65 @@ where p.units_in_stock >0;
 select  c.country, count(c.customer_id) 
 from customers c
 group by c.country;
+
+11) Obtener un reporte de edades de los empleados para checar su elegibilidad para seguro de gastos médicos menores.
+
+select concat(e.first_name, e.last_name),(current_date -e.birth_date)/365 
+from employees e;
+
+12) Cuál es la orden más reciente por cliente?
+
+select o.customer_id, max(o.order_id)
+from orders o 
+group by o.customer_id;
+
+13) Cuántos productos tenemos de cada categoría?
+
+select p.category_id, count(p.product_id)
+from products p
+group by p.category_id ;
+
+14) De nuestros clientes, qué función desempeñan y cuántos son?
+
+select c.contact_title, count(c.customer_id)
+from customers c 
+group by c.contact_title ;
+
+
+15) 
+
+
+
+
+
+16) A donde va nuestro envío más voluminoso?
+
+select o.ship_country ,max(o.freight) 
+from orders o
+group by o.ship_country, o.freight  
+order by o.freight desc
+limit 1;
+
+
+
+17)
+
+
+
+18)
+
+
+
+19)
+
+
+
+
+
+20) Qué país recibe el mayor volumen de producto?
+
+select o.ship_country ,sum(o.freight) 
+from orders o
+group by o.ship_country
+order by sum(o.freight) desc
+limit 1;
