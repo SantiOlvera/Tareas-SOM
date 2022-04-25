@@ -38,7 +38,7 @@ select o.order_id
 from orders o 
 where (o.ship_country ='Mexico' or o.ship_country='Argentina' or o.ship_country='Venezuela' or o.ship_country='Brazil') and shipped_date is  null;
 
-7)Qué órdenes no van a LATAM?
+7) Qué órdenes no van a LATAM?
 
 select o.order_id 
 from orders o 
