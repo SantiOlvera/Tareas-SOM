@@ -30,19 +30,19 @@ group by p.product_name ;
 
 select o.order_id 
 from orders o 
-where (o.ship_country='Belgium' or o.ship_country='France') and shipped_date is null;
+where (o.ship_country='Belgium' or o.ship_country='France') and shipped_date is not null;
 
 6) Qué órdenes van a LATAM?
 
 select o.order_id 
 from orders o 
-where (o.ship_country ='Mexico' or o.ship_country='Argentina' or o.ship_country='Venezuela' or o.ship_country='Brazil') and shipped_date is  null;
+where (o.ship_country ='Mexico' or o.ship_country='Argentina' or o.ship_country='Venezuela' or o.ship_country='Brazil') and shipped_date is not null;
 
 7) Qué órdenes no van a LATAM?
 
 select o.order_id 
 from orders o 
-where (o.ship_country !='Mexico' and o.ship_country!='Argentina' and o.ship_country!='Venezuela' and o.ship_country!='Brazil') and shipped_date is null;
+where (o.ship_country !='Mexico' and o.ship_country!='Argentina' and o.ship_country!='Venezuela' and o.ship_country!='Brazil') and shipped_date is not null;
 
 8) Necesitamos los nombres completos de los empleados, nombres y apellidos unidos en un mismo registro
 
@@ -63,7 +63,7 @@ group by c.country;
 
 11) Obtener un reporte de edades de los empleados para checar su elegibilidad para seguro de gastos médicos menores.
 
-select concat(e.first_name, e.last_name),(current_date -e.birth_date)/365 
+select concat(e.first_name,' ',e.last_name),(current_date -e.birth_date)/365 
 from employees e;
 
 12) Cuál es la orden más reciente por cliente?
@@ -74,9 +74,9 @@ group by o.customer_id;
 
 13) Cuántos productos tenemos de cada categoría?
 
-select p.category_id, count(p.product_id)
-from products p
-group by p.category_id ;
+select c.category_name , count(p.product_id)
+from products p join categories c using(category_id)
+group by c.category_name  ;
 
 14) De nuestros clientes, qué función desempeñan y cuántos son?
 
@@ -85,8 +85,15 @@ from customers c
 group by c.contact_title ;
 
 
-15) 
+15) Cómo podemos generar el reporte de reorder? 
 
+
+select s.company_name , sum(p.reorder_level)
+from suppliers s join products p using(supplier_id)
+group by s.company_name  
+order by 2 desc ;
+
+---Aquí vememos que compañias son con las que hace más reorder de sus productos. Es dececir que compañías son claves para el funcionamiento del negocio.
 
 
 
@@ -101,15 +108,40 @@ limit 1;
 
 
 
-17)
+17) Cómo creamos una columna en customers que nos diga si un cliente es bueno, regular, o malo?
+
+select c.contact_name , sum((od.unit_price*(1-od.discount)*od.quantity)) as comprado_en_empresa,
+case  
+	when sum((od.unit_price-od.unit_price *od.discount)*od.quantity) >=15000 then 'Bueno'
+	when  sum((od.unit_price-od.unit_price *od.discount)*od.quantity) <5000 then 'Malo'
+	else 'Regular'
+end as ranking
+from customers c join orders o using(customer_id) join order_details od using(order_id)
+group by c.contact_name ;
+
+---- La clasificacion fue con base en el valor total de la mercancia comprada. Los que son buenos son clientes a cuidar, pues representan mucha compra
+
+
+18) Qué colaboradores chambearon durante las fiestas de navidad?
+
+select concat(e.first_name,' ', e.last_name)
+from employees e join orders o using(employee_id)
+where cast(o.shipped_date   as text)like '%12-25' or cast(o.shipped_date   as text)like '%12-24'
+group by concat(e.first_name,' ', e.last_name);
+
+---Se asume que colaboradores son los empleados que tuvieron que dar los paquetes el di de envio
 
 
 
-18)
+19) Qué productos mandamos en navidad?
 
+select p.product_name, o.shipped_date
+from orders o join order_details od using(order_id) join products p using (product_id)
+where cast(o.shipped_date  as text)like '%12-25' or cast(o.shipped_date   as text)like '%12-24'
+group by p.product_name, o.shipped_date
+order by 2;
 
-
-19)
+---Suponiendo que navidad es de 24 y 25
 
 
 
@@ -120,5 +152,5 @@ limit 1;
 select o.ship_country ,sum(o.freight) 
 from orders o
 group by o.ship_country
-order by sum(o.freight) desc
+order by 2 desc
 limit 1;
