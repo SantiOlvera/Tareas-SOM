@@ -80,8 +80,8 @@ order by 2 desc ;
    16) A donde va nuestro envío más voluminoso?
 select o.ship_country ,max(o.freight) 
 from orders o 
-group by o.ship_country, o.freight
-order by o.freight desc limit 1;
+group by o.ship_country
+order by 2 desc  limit 1;
 
    17) Cómo creamos una columna en customers que nos diga si un cliente es bueno, regular, o malo?
 
