@@ -1,79 +1,79 @@
 Tareas Bases Datos
 
-   1) Qué contactos de proveedores tienen la posición de sales representative?
+   ---1) Qué contactos de proveedores tienen la posición de sales representative?
 select s.contact_name 
 from suppliers s 
 where contact_title ='Sales Representative';
 
-   2) Qué contactos de proveedores no son marketing managers?
+   ---2) Qué contactos de proveedores no son marketing managers?
 select s.contact_name 
 from suppliers s 
 where contact_title !='Marketing Manager';
 
-   3) Cuales órdenes no vienen de clientes en Estados Unidos?
+   ---3) Cuales órdenes no vienen de clientes en Estados Unidos?
 select o.order_id 
 from orders o join customers c using(customer_id) 
 where c.country !='USA';
 
-   4) Qué productos de los que transportamos son quesos?
+   ---4) Qué productos de los que transportamos son quesos?
 select p.product_name 
 from categories c join products p using(category_id) join order_details od using(product_id) join orders o using(order_id) 
 where shipped_date is not null and c.description ='Cheeses' 
 group by p.product_name ;
 
-   5) Qué ordenes van a Bélgica o Francia?
+   ---5) Qué ordenes van a Bélgica o Francia?
 select o.order_id 
 from orders o 
 where (o.ship_country='Belgium' or o.ship_country='France') and shipped_date is not null;
 
-   6) Qué órdenes van a LATAM?
+   ---6) Qué órdenes van a LATAM?
 select o.order_id 
 from orders o 
 where ship_country in ('Brazil', 'Mexico', 'Venezuela', 'Argentina') and shipped_date is not  null;
 
-   7) Qué órdenes no van a LATAM?
+   ---7) Qué órdenes no van a LATAM?
 select o.order_id 
 from orders o 
 where ship_country not in ('Brazil', 'Mexico', 'Venezuela', 'Argentina') and shipped_date is not  null;
 
-   8) Necesitamos los nombres completos de los empleados, nombres y apellidos unidos en un mismo registro
+   ---8) Necesitamos los nombres completos de los empleados, nombres y apellidos unidos en un mismo registro
 select concat(e.first_name,' ',e.last_name ) as nombre_completo
 from employees e ;
 
-   9) Cuánta lana tenemos en inventario?
+   ---9) Cuánta lana tenemos en inventario?
 select sum(p.unit_price*p.units_in_stock) as total_lana
 from products p 
 where p.units_in_stock >0;
 
-   10) Cuantos clientes tenemos de cada país?
+   ---10) Cuantos clientes tenemos de cada país?
 select c.country, count(c.customer_id) as numero_clientes
 from customers c 
 group by c.country
 order by 2 desc;
 
-   11) Obtener un reporte de edades de los empleados para checar su elegibilidad para seguro de gastos médicos menores.
+   ---11) Obtener un reporte de edades de los empleados para checar su elegibilidad para seguro de gastos médicos menores.
 select concat(e.first_name,' ',e.last_name),(current_date -e.birth_date)/365 as edades
 from employees e;
 
-   12) Cuál es la orden más reciente por cliente?
+   ---12) Cuál es la orden más reciente por cliente?
 select c.contact_name , max(o.order_id) 
 from customers c join orders o using(customer_id)
 group by c.contact_name
 order by 2;
 
-   13) Cuántos productos tenemos de cada categoría?
+   ---13) Cuántos productos tenemos de cada categoría?
 select c.category_name , count(p.product_id) as numero_productos
 from products p join categories c using(category_id) 
 group by c.category_name 
 order by 2 desc;
 
-   14) De nuestros clientes, qué función desempeñan y cuántos son?
+   ---14) De nuestros clientes, qué función desempeñan y cuántos son?
 select c.contact_title, count(c.customer_id) as numero_clientes
 from customers c 
 group by c.contact_title 
 order by 2 desc;
 
-   15) Cómo podemos generar el reporte de reorder?
+   ---15) Cómo podemos generar el reporte de reorder?
 select s.company_name , sum(p.reorder_level) as nivel_reorder_productos
 from suppliers s join products p using(supplier_id) 
 group by s.company_name
@@ -81,13 +81,13 @@ order by 2 desc ;
 
 ---Aquí vememos que compañias son con las que hace más reorder de sus productos. Es dececir que compañías son claves para el funcionamiento del negocio.
 
-   16) A donde va nuestro envío más voluminoso?
+   ---16) A donde va nuestro envío más voluminoso?
 select o.ship_country ,max(o.freight) as volumen
 from orders o 
 group by o.ship_country
 order by 2 desc  limit 1;
 
-   17) Cómo creamos una columna en customers que nos diga si un cliente es bueno, regular, o malo?
+   ---17) Cómo creamos una columna en customers que nos diga si un cliente es bueno, regular, o malo?
 
 select c.contact_name , sum((od.unit_price*(1-od.discount)*od.quantity)) as comprado_en_empresa, case
 when sum((od.unit_price-od.unit_price *od.discount)*od.quantity) >=15000 then 'Bueno' 
@@ -100,7 +100,7 @@ order by 2 desc;
 
 ---- La clasificacion fue con base en el valor total de la mercancia comprada. Los que son buenos son clientes a cuidar, pues representan mucha compra.
 
-   18) Qué colaboradores chambearon durante las fiestas de navidad?
+   ---18) Qué colaboradores chambearon durante las fiestas de navidad?
 select concat(e.first_name,' ', e.last_name) 
 from employees e join orders o using(employee_id)
 where cast(o.shipped_date as text)like '%12-25' 
@@ -108,7 +108,7 @@ group by concat(e.first_name,' ', e.last_name);
 
 ---Se asume que colaboradores son los empleados que tuvieron que trabajar cuando se realizó el envio de la orden en la que están como encargados
 
-   19) Qué productos mandamos en navidad?
+   ---19) Qué productos mandamos en navidad?
 select p.product_name, o.shipped_date 
 from orders o join order_details od using(order_id) join products p using (product_id) 
 where cast(o.shipped_date as text)like '%12-25' 
@@ -117,7 +117,7 @@ order by 2;
 
 ---Suponiendo que navidad es de 24 y 25
 
-   20) Qué país recibe el mayor volumen de producto?
+   ---20) Qué país recibe el mayor volumen de producto?
 select o.ship_country ,sum(o.freight) as volumen
 from orders o 
 group by o.ship_country 
