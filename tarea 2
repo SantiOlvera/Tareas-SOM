@@ -1,0 +1,43 @@
+---Creo la tabla de superheroe con su mail
+create table mail ( 
+	id_mail numeric (4,0) constraint pk_mail primary key,
+	nombres varchar(50) not null,
+	correo varchar (100) not null 
+);
+
+--
+create sequence superheroe_id_mail_seq start 1 increment 1;
+alter table mail alter column id_mail set default nextval ('superheroe_id_mail_seq');
+--
+
+---Doy de alta al superheroe con su mail
+insert into superheroe.mail 
+(nombres, correo)
+values
+('Wanda Maximoff','wanda.maximoff@avengers.org'),
+('Pietro Maximoff','pietro@mail.sokovia.ru'),
+('Erik Lensherr','fuck_you_charles@brotherhood.of.evil.mutants.space'),
+('Charles Xavier','i.am.secretely.filled.with.hubris@xavier-school-4-gifted-youngste.'),
+('Anthony Edward Stark','iamironman@avengers.gov'),
+('Steve Rogers','americas_ass@anti_avengers'),
+('The Vision','vis@westview.sword.gov'),
+('Clint Barton','bul@lse.ye'),
+('Natasja Romanov','blackwidow@kgb.ru'),
+('Thor','god_of_thunder-^_^@royalty.asgard.gov'),
+('Logan','wolverine@cyclops_is_a_jerk.com'),
+('Ororo Monroe','ororo@weather.co'),
+('Scott Summers','o@x'),
+('Nathan Summers','cable@xfact.or'),
+('Groot','iamgroot@asgardiansofthegalaxyledbythor.quillsux'),
+('Nebula','idonthaveelektras@complex.thanos'),
+('Gamora','thefiercestwomaninthegalaxy@thanos.'),
+('Rocket','shhhhhhhh@darknet.ru');
+
+select * from mail;
+
+---Aquí hago el query que regresa correos inválidos
+select *
+from mail m
+where m.correo not like '%@%._%';
+
+---El correo de thor en el git lo marca como inválido, pero en realidad si es un correo válido. Sí deja enviar a correo a thor
