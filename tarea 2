@@ -36,7 +36,7 @@ values
 select * from mail;
 
 ---Aquí hago el query que regresa correos inválidos
-select *
+select m.correo as correo_invalido
 from mail m
 where m.correo not like '%@%._%';
 
