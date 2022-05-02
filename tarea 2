@@ -45,5 +45,3 @@ where m.correo not like '%@%._%';
 select m.correo as correo_invalido
 from mail m
 where m.correo not like '%@%._%' or m.correo like '%^_^%';
-
-sex
