@@ -36,8 +36,12 @@ values
 select * from mail;
 
 ---Aquí hago el query que regresa correos inválidos
+---El correo de thor en el git lo marca como inválido, pero en realidad si es un correo válido. Sí deja enviar a correo a thor 
 select m.correo as correo_invalido
 from mail m
 where m.correo not like '%@%._%';
 
----El correo de thor en el git lo marca como inválido, pero en realidad si es un correo válido. Sí deja enviar a correo a thor
+---Aquí esta el caso en el que thor si es invalido
+select m.correo as correo_invalido
+from mail m
+where m.correo not like '%@%._%' or m.correo like '%^%';
