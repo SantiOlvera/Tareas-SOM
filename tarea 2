@@ -44,4 +44,4 @@ where m.correo not like '%@%._%';
 ---Aquí esta el caso en el que thor si es invalido
 select m.correo as correo_invalido
 from mail m
-where m.correo not like '%@%._%' or m.correo like '%^%';
+where m.correo not like '%@%._%' or m.correo like '%^_^%';
