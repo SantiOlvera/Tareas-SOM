@@ -49,4 +49,4 @@ where m.correo not like '%@%._%' or m.correo like '%^_^%';
 ----Caso mas general con error en sintaxis y con caracteres inválidos, que son  ()<>@,;:"[]ç%& y espacio
 select m.correo as correo_invalido
 from mail m
-where correo not like '%@%._%' or correo like '%,%' or correo like '%&%' or correo like '%Ç%'  or correo like '%]%' or correo like '%[%' or correo like '%;"%' or correo like '%?%' or correo like '%:%'  or correo like '%(%' or correo like '%)%' or correo like '%<%' or correo like '%>%' or correo like '%@%@' or correo like '% %' or correo like '%"%';
+where correo not like '%@%._%' or correo like '%,%' or correo like '%&%' or correo like '%Ç%'  or correo like '%]%' or correo like '%[%' or correo like '%;"%' or correo like '%?%' or correo like '%:%'  or correo like '%(%' or correo like '%)%' or correo like '%<%' or correo like '%>%' or correo like '%@%@' or correo like '% %' or correo like '%"%' or correo not like '%@%';
