@@ -41,7 +41,7 @@ select m.correo as correo_invalido
 from mail m
 where m.correo not like '%@%._%';
 
----Aquí esta el caso en el que thor si es invalido
+---Aquí esta el caso en el que thor si es invalido, en el dado caso que sea inválido por tener la carita ^_
 select m.correo as correo_invalido
 from mail m
 where m.correo not like '%@%._%' or m.correo like '%^_^%';
