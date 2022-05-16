@@ -16,7 +16,8 @@ limit 1;
 select f.title, count(r.rental_id) 
 from film f join inventory i using (film_id) join rental r using(inventory_id)
 group by f.title 
-having count(r.rental_id)>=32;
+having count(r.rental_id)>=32
+order by 2 desc;
 
 ---Cuál es nuestro revenue por store?
 select a.address, sum(p.amount )
