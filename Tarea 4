@@ -26,7 +26,7 @@ AS (
 	group by c.first_name, t.customer_id
 	order by t.customer_id asc 
 	);
- ---Aquí lo pongo como una tabla nueva, pues necesito que los datos de los intervalos de tiempo sean en formato de numeros. Entonces los pormedio más bajos tendrán un equivalente a un
+ ---Aquí lo pongo como una tabla nueva, pues necesito que los datos de los intervalos de tiempo sean en formato de numeros. Entonces los pormedios más bajos tendrán un equivalente a un
  ---numero más bajo y los intervalos más grandes con un numero mayor. Esto lo hice pues el histograma no aceptaba datos tipo fecha
 
 select * from Promedi; ---Aquí se ven los numeros
@@ -46,7 +46,7 @@ group by c.first_name, t.customer_id
 order by t.customer_id asc; 
 
 ---Haciendo la comparativa, solo encontre un caso en el que fuera diferente, en el customer con id 16 (Sandra).
----Sin embargo, la conclusión de los datos similares es que un customer puede rentar otra película siempre y cuando haya hecho el pago de la misma
+---Sin embargo, la conclusion es que un customer puede rentar otra película siempre y cuando haya hecho el pago de la misma. Por eso siguen los mismos resultados
 
 
 
