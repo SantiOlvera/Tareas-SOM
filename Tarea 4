@@ -1,0 +1,95 @@
+---1.- Cuál es el promedio, en formato human-readable, de tiempo entre cada pago por cliente de la BD Sakila?
+
+with inter as (
+	select p.payment_date , p.customer_id , age(p.payment_date, LAG(p.payment_date) OVER (ORDER BY p.customer_id, p.payment_date)) AS days_since_last_pay
+	FROM payment p 
+	order by p.customer_id,p.payment_date
+)select c.first_name, t.customer_id, extract (day from (cast(avg(t.days_since_last_pay) as interval))) || ' dias '|| extract (hour from (cast(avg(t.days_since_last_pay) as interval))) || ' horas '|| extract (minute from (cast(avg(t.days_since_last_pay) as interval))) || ' minutos' as tiempo_promedio
+from inter t join customer c using(customer_id)
+where cast(t.days_since_last_pay as character) not like '-%'
+group by c.first_name, t.customer_id
+order by t.customer_id asc; 
+
+---Puedo hacer la parte en la que lo convierto a tipo caracter, porque todos los saltos entre customers siempre son negativos. Entonces esto no altera ningun resultado
+
+---2.- Sigue una distribución normal?
+
+CREATE VIEW Promedi
+AS (
+	with inter as (
+	select p.payment_date , p.customer_id , age(p.payment_date, LAG(p.payment_date) OVER (ORDER BY p.customer_id, p.payment_date)) AS days_since_last_pay
+	FROM payment p 
+	order by p.customer_id,p.payment_date
+	)select c.first_name, t.customer_id, extract(epoch from (cast(avg(t.days_since_last_pay) as interval)) )
+	from inter t join customer c using(customer_id)
+	where cast(t.days_since_last_pay as character) not like '-%'
+	group by c.first_name, t.customer_id
+	order by t.customer_id asc 
+	);
+ ---Aquí lo pongo como una tabla nueva, pues necesito que los datos de los intervalos de tiempo sean en formato de numeros. Entonces los pormedio más bajos tendrán un equivalente a un
+ ---numero más bajo y los intervalos más grandes con un numero mayor. Esto lo hice pues el histograma no aceptaba datos tipo fecha
+
+select * from Promedi; ---Aquí se ven los numeros
+select * from histogram('Promedi','extract'); ---Y aquí se ve el histograma
+
+----Y en respuesta a la pregunta, se ve que la distribucion tiene un sesgo positivo, es decir, esta cargada a la izquierda, pues hay muchos intervalos de menor tiempo. Por lo tanto, no es normal
+
+----3.-Qué tanto difiere ese promedio del tiempo entre rentas por cliente?
+with inter as (
+	select r.rental_date, r.customer_id , age(r.rental_date, LAG(r.rental_date) OVER (ORDER BY r.customer_id, r.rental_date)) AS days_since_last_rent
+	FROM rental r 
+	order by r.customer_id,r.rental_date
+)select c.first_name, t.customer_id, extract (day from (cast(avg(t.days_since_last_rent) as interval))) || ' dias '|| extract (hour from (cast(avg(t.days_since_last_rent) as interval))) || ' horas '|| extract (minute from (cast(avg(t.days_since_last_rent) as interval))) || ' minutos' as tiempo_promedio
+from inter t join customer c using(customer_id)
+where cast(t.days_since_last_rent as character) not like '-%'
+group by c.first_name, t.customer_id
+order by t.customer_id asc; 
+
+---Haciendo la comparativa, solo encontre un caso en el que fuera diferente, en el customer con id 16 (Sandra).
+---Sin embargo, la conclusión de los datos similares es que un customer puede rentar otra película siempre y cuando haya hecho el pago de la misma
+
+
+
+
+
+
+------IGUAL AQUÍ PONGO LA FUNCION HISTOGRAMA
+CREATE OR REPLACE FUNCTION histogram(table_name_or_subquery text, column_name text)
+RETURNS TABLE(bucket int, "range" numrange, freq bigint, bar text)
+AS $func$
+BEGIN
+RETURN QUERY EXECUTE format('
+  WITH
+  source AS (
+    SELECT * FROM %s
+  ),
+  min_max AS (
+    SELECT min(%s) AS min, max(%s) AS max FROM source
+  ),
+  histogram AS (
+    SELECT
+      width_bucket(%s, min_max.min, min_max.max, 20) AS bucket,
+      numrange(min(%s)::numeric, max(%s)::numeric, ''[]'') AS "range",
+      count(%s) AS freq
+    FROM source, min_max
+    WHERE %s IS NOT NULL
+    GROUP BY bucket
+    ORDER BY bucket
+  )
+  SELECT
+    bucket,
+    "range",
+    freq::bigint,
+    repeat(''*'', (freq::float / (max(freq) over() + 1) * 15)::int) AS bar
+  FROM histogram',
+  table_name_or_subquery,
+  column_name,
+  column_name,
+  column_name,
+  column_name,
+  column_name,
+  column_name,
+  column_name
+  );
+END
+$func$ LANGUAGE plpgsql;
