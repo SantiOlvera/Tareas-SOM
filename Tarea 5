@@ -1,0 +1,35 @@
+----Primero vemos cuantas peliculas son por cada store_id 
+select i.store_id , a.address  ,count(f.film_id) from inventory i join film f using(film_id) join store s using(store_id) join address a using(address_id) group by i.store_id, a.address  ;
+----Aquí vemos la distribucion de las peliculas en cunato a categoria y en que tienda estan
+select c."name" ,i.store_id , a.address,  count(f.film_id) from category c join film_category fc using(category_id) join film f using(film_id) join inventory i using(film_id) join store s using(store_id) join address a using(address_id) group by c."name", i.store_id, a.address ;
+----Ahora, vamos a ver cuantas peliculas caben en el cilindro si cada pelicula pesa 500 gr y el cilindro agunata 50 kg
+select 50/.5 as "peliculas/cilindro";-- Una solucion optima puede ser que los cilindros tengan 100 peliculas 
+
+----Entonces por los dos último querry, como el numero de peliculas por clasificacion no es muy grande, para su mejor manejo, estos puedenestar distribuidos en paquetes de 75 peliculas. 
+----Pues ninguno pasa de las 200 peliculas, así se podrían organizar mejor.
+----Además como el peso maximo es de 50kg, tenemos orgura de que no hayan accidentes por si hay una falla con el peso en los cilindros
+
+
+----Por otro lado, podemos hacer una suposicionn de que el brazo automatico necesita un cierto espacio para maniobrar y agarrar la pelicula.
+----Entonces este espacio se encuntra dentro del cilindro, es decir, las peliculas estarán puestas de forma que formen un cículo en el centro por si es necesario que el brazo automatico lo necesite para operar
+
+
+----Ahora vamos a ver las medidas del circulo que forman las peliculas 
+----Esto se va a componer de un poligono de 75 lados con longuitud de 8 cm. Y las peliculas se encuntran acostadas, es decir que la base es de 30 cm y la altura de 21 cm
+----Vamos a calcular el algunas medidas del poligono para despues sacar la medida de la base del circulo
+
+----Se sabe que la distancia que hay entre el centro del poligono y un lado se llama apotema. El apotema se calcula ap=L/(2*tan((360/n)/2))
+----Donde L es la longuitud del lado y n el numero de lados
+----En este caso L=8, n=75
+select ((360*1.0/75)/2)*(pi()/180);--Aqui hacemos tranfomacion de radianes a grados porque el tangente lo calcula en radianes
+select (8/(2*tan(0.041887902047863905))); ---Aquí obtenemos el resultado de ap
+
+----Ahora vamos a ver cual es la distancia hasta la otra parte de la pelicula 
+select(95.43710878497178+30);---aquí obtenemos la distancia al otro lado de la pelicula
+select sqrt(power(125.43710878497178,2)+power(4,2)); --Este es el radio de todo el cilindro en el que estrian contenidas las peliculas 
+select pi()*power(125.50086956006658,2);---Esta es el area de la base
+select 49481.55537726088*21 as volumen;---Y este es el volumen del cilindro
+
+----Ahora podemos ver cuantos cilindros necesitarian las tiendas y cuantos de cada categoria 
+select i.store_id , a.address  ,ceil((count(f.film_id)*1.0)/75) as cilindros from inventory i join film f using(film_id) join store s using(store_id) join address a using(address_id) group by i.store_id, a.address  ;
+select c."name" ,i.store_id ,a.address, ceil((count(f.film_id)*1.0)/75) as cilindros from category c join film_category fc using(category_id) join film f using(film_id) join inventory i using(film_id) join store s using(store_id) join address a using(address_id)  group by c."name", i.store_id,a.address ;
