@@ -1,0 +1,21 @@
+----
+with compras as(
+	select o.customer_id as cliente, c.contact_name as nombre_contacto_cliente, o.order_id as orden, od.unit_price*od.quantity as total_compra, o.order_date as fecha---Subselect para ver el total de compra y fecha de compra 
+	from order_details od join orders o using (order_id) join customers c using(customer_id)
+	), diferencia as (select extract(year from c.fecha) as anho, extract(month from c.fecha) as mes, c.cliente ,c.nombre_contacto_cliente ,(total_compra -lag(total_compra) over (partition by c.cliente order by fecha asc)) as delta ----Aqui hacemos la diferencia entre t y t-1
+	from compras c), promedio as(select d.anho, d.mes, d.cliente, d.nombre_contacto_cliente, avg(d.delta) as promedio_progresion ---Aquí se hace le promedio de la progresion 
+	from diferencia d
+	group by d.mes, d.anho, d.cliente, d.nombre_contacto_cliente 
+	order by 3 asc, 1 asc, 2 asc)
+select p.anho, p.mes, p.cliente, p.nombre_contacto_cliente, p.promedio_progresion, case ---Aqui podemos dar la calificacion por mes al cliente, algo similar a una pregunta de la Tarea 1
+when p.promedio_progresion>100 then 'Bueno'
+when p.promedio_progresion <0 then 'Malo'
+else 'Regular'
+end as ranking
+from promedio p
+group by p.mes, p.anho, p.cliente, p.nombre_contacto_cliente, p.promedio_progresion 
+order by 3 asc, 1 asc, 2 asc;
+--------La progesion empieza desde el primer mes y continua con la suiguiente compra, es decir, no se reinicia cada mes.
+--------Esta decicion fue porque habria muchos datos null en el análisis
+--------Y los datos null en esta muestra, nos dice que al inicio de la progresion solo hubo una compra en el mes. En los demas no va haber null por la medida que se tomo
+--------Por lo mismo en los null se pone que fue regular, pues no hay punto de comparacion
